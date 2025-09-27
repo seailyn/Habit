@@ -24,7 +24,7 @@ class Habit:
         return self.longest_streak
 
     def edit_habit(self):
-        edit(self.habit_id,self.name, self.description)
+        edit(self.habit_id, self.name, self.description)
 
     def check_habit(self, date):
         check(self.habit_id, date)
@@ -46,4 +46,5 @@ class Yearly(Habit):
 
     def __init__(self, habit_id, name, description):
         super().__init__(habit_id, name, description, 'yearly')
+
 
