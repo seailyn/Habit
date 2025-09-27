@@ -1,5 +1,5 @@
 from analytics import calculate_streak
-from db import initialize_db, edit, check_date, check
+from db import initialize_db, edit, check_date, check, delete
 
 
 class Habit:
@@ -28,6 +28,9 @@ class Habit:
 
     def check_habit(self, date):
         check(self.habit_id, date)
+        
+    def delete_habit(self):
+        delete(self.habit_id)
 
 class Weekly(Habit):
 
@@ -43,3 +46,4 @@ class Yearly(Habit):
 
     def __init__(self, habit_id, name, description):
         super().__init__(habit_id, name, description, 'yearly')
+
