@@ -37,6 +37,7 @@ def edit(habit_id, name, description):
             cursor.execute("""
                 INSERT INTO habit (name, description) VALUES(?, ?)
             """, (name, description))
+            Habit.habit_id = cursor.lastrowid
 
         con.commit()
 
@@ -67,5 +68,6 @@ def check(habit_id, date):
             cursor.execute("""
                 INSERT INTO checks (habit_id, checked_date) VALUES(?, ?)
             """, (habit_id, date))
+
 
         con.commit()
