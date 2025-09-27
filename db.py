@@ -69,5 +69,13 @@ def check(habit_id, date):
                 INSERT INTO checks (habit_id, checked_date) VALUES(?, ?)
             """, (habit_id, date))
 
-
         con.commit()
+
+def delete(habit_id):
+    with sqlite3.connect(Habit.DB_NAME) as con:
+        cursor = con.cursor()
+        cursor.execute("""
+            DELETE FROM habit WHERE id = ?
+        """, habit_id)
+
+    con.commit()
