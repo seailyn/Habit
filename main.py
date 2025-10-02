@@ -1,8 +1,8 @@
 from datetime import date, datetime
 import questionary
-from habit import Habit, Weekly, Monthly, Yearly
-from analytics import get_habits
-from db import check_date, get_habit_all
+from habit import Habit
+from analytics import return_questionary_choice_habits, return_overall_longest_streak, return_habits_by_period
+from db import check_date, mark_incomplete, mark_complete, get_habit_by_id, get_habit_completion_count
 
 
 def main_menu():
@@ -34,40 +34,51 @@ def main_menu():
     elif choice == 'Exit':
         exit()
 
+
 def main_check():
-    habit_id = questionary.text(f'Please enter the id of the habit you want to check off. \
-        These are your current habits:{get_habits(period = 'full')}').ask()
+    print(f'Please select the habit you want to complete.')
+    habits = questionary.select('These are your current habits:',
+                                choices=
+                                return_questionary_choice_habits()
+                                ).ask()
 
-    habit = Habit.get_habit(habit_id)
-
-    if not habit:
-        print('No such habit.')
-        main_menu()
-
+    split = habits.split(',')[0]
+    habit_id = split[1:]
     today = questionary.confirm('Would you like to check today?').ask()
 
-    if today == 'Yes':
-        approval = check_date(habit_id, date.today())
+    if today:
 
-        if approval:
+        date_today = date.today().strftime("%Y-%m-%d")
+
+        if check_date(habit_id, date_today):
             uncheck_today = questionary.confirm(
-                'Habit has already been checked for today. Do you want to uncheck today?').ask()
+                f'Habit has already been checked for {date_today}. Do you want to uncheck {date_today}?').ask()
 
             if uncheck_today:
-                Habit.check_habit(habit_id, date.today())
-                print('Habit has been successfully unchecked.')
+                mark_incomplete(habit_id, date_today)
+                print(f'Habit has been successfully unchecked for {date_today}.')
                 main_menu()
 
-            if not uncheck_today:
+            elif not uncheck_today:
                 main_menu()
 
-        if not approval:
-            Habit.check_habit(habit_id, datetime.today())
-            print('Habit has been successfully checked.')
+        elif not check_date(habit_id, date_today):
+            mark_complete(habit_id, date_today)
+            print(f'Habit has been successfully checked for {date_today}.')
             main_menu()
 
     if not today:
         entered_date = questionary.text('Please enter the date(YYYY-MM-DD) you want to check').ask()
+
+        try:
+            date_format = bool(datetime.strptime(entered_date, '%Y-%m-%d'))
+        except ValueError:
+            date_format = False
+
+        if not date_format:
+            print('Please enter the date you want to check in this format: YYYY-MM-DD')
+            main_menu()
+
         approval = check_date(habit_id, entered_date)
 
         if approval:
@@ -75,23 +86,24 @@ def main_check():
                 f'Habit has already been checked for {entered_date}. Do you want to uncheck?').ask()
 
             if uncheck_date:
-                Habit.check_habit(habit_id, entered_date)
+                mark_incomplete(habit_id, entered_date)
                 print(f'Habit has been successfully unchecked for {entered_date}.')
                 main_menu()
 
             if not uncheck_date:
                 main_menu()
 
-        if not approval:
-            Habit.check_habit(habit_id, entered_date)
+        elif not approval:
+            mark_complete(habit_id, entered_date)
             print(f'Habit has been successfully checked for {entered_date}.')
             main_menu()
+
 
 def main_create():
     name = questionary.text('What is the name of your Habit?').ask()
     description = questionary.text('What is the description of your Habit?').ask()
     period = questionary.select(
-        'In what periodicity should your Habit be tracked? Beware this cannot be changed ',
+        'In what periodicity should your Habit be tracked?',
         choices=[
             'daily',
             'weekly',
@@ -100,51 +112,54 @@ def main_create():
         ]
     ).ask()
 
-    if period == 'daily':
-        habit = Habit(name = name, description = description)
-    elif period == 'weekly':
-        habit = Weekly(name = name, description = description)
-    elif period == 'monthly':
-        habit = Monthly(name = name, description = description)
-    elif period == 'yearly':
-        habit = Yearly(name = name, description = description)
+    habit = Habit(name=name, description=description, period=period)
 
-    habit.create_habit()
+    habit.add_habit()
     print('Habit created!')
     main_menu()
 
+
 def main_edit():
-    habit_id = questionary.text(
-        f'Please enter the ID of the habit you want to edit? These are your current habits: {get_habits(period = 'full')}'
+    habits = questionary.select('These are your current habits:',
+                                choices=
+                                return_questionary_choice_habits()
+                                ).ask()
+
+    split = habits.split(',')[0]
+    habit_id = split[1:]
+
+    old_habit = get_habit_by_id(habit_id)
+
+    name = questionary.text(f'Please enter the new habit name(current: {old_habit.name}):').ask()
+    description = questionary.text(f'Please enter the new habit description:(current: {old_habit.description}):').ask()
+    period = questionary.select('In what periodicity should your Habit be tracked?',
+        choices=[
+            'daily',
+            'weekly',
+            'monthly',
+            'yearly'
+        ]
     ).ask()
-    habit = Habit.get_habit(habit_id)
 
-    if not habit:
-        print('Habit not found!')
-        main_menu()
-        return
-
-    name = questionary.text(f'Please enter the new habit name(current: {habit.name}):')
-    description = questionary.text(f'Please enter the new habit description:(current: {habit.description}):')
-
-    habit.name = name
-    habit.description = description
+    habit = Habit(habit_id=habit_id, name=name, description=description, period=period)
     habit.edit_habit()
     print('Habit edited!')
     main_menu()
 
+
 def main_delete():
-    habit_id = questionary.text(
-        f'Please enter the ID of the habit you want to delete? These are your current habits: {get_habits(period = 'full')}'
-    ).ask()
-    habit = Habit.get_habit(habit_id)
+    print(f'Please select the habit you want to delete.')
+    habits = questionary.select('These are your current habits:',
+                                choices=
+                                return_questionary_choice_habits()
+                                ).ask()
 
-    if not habit:
-        print('Habit not found!')
-        main_menu()
-        return
+    split = habits.split(',')[0]
+    habit_id = split[1:]
 
-    approval = questionary.confirm(f'Are you sure you want to delete {habit.name}?')
+    habit = get_habit_by_id(habit_id)
+
+    approval = questionary.confirm(f'Are you sure you want to delete Habit: {habit.name}?').ask()
     if approval:
         habit.delete_habit()
         print('Habit deleted!')
@@ -153,30 +168,40 @@ def main_delete():
 
 
 def main_analyze():
-    habit_id = questionary.text(
-        f'Please enter the id of the habit you want to analyze?'
-        f' These are your current habits: {get_habits(period = 'full')}').ask()
-    habit = Habit.get_habit(habit_id)
+    print(f'Please select the habit you want to analyze.')
+    habits = questionary.select('These are your current habits:',
+                                choices=
+                                return_questionary_choice_habits()
+                                ).ask()
 
-    if not habit:
-        print('Habit not found!')
-        main_menu()
-        return
+    split = habits.split(',')[0]
+    habit_id = split[1:]
 
-    habit_data = get_habit_all(habit_id)
-    current_streak = Habit.get_current_streak(habit_id)
-    longest_streak = Habit.get_longest_streak(habit_id)
+    habit_data = get_habit_by_id(habit_id)
+    habit = Habit(habit_id = habit_id)
+    current_streak = habit.get_current_streak()
+    longest_streak = habit.get_longest_streak()
+    completed_dates = get_habit_completion_count(habit_id)
 
-    print(habit_data)
-    print(f'Your current_streak is {current_streak}')
-    print(f'Your longest streak is {longest_streak}')
+    print(f'Habit ID:               {habit_data.habit_id}\n'
+          f'Habit Name:             {habit_data.name}\n'
+          f'Habit Description:      {habit_data.description}\n'
+          f'Habit Period:           {habit_data.period}\n'
+          f'Habit Creation Time:    {habit_data.creation_time}\n'
+          f'Habit Checked:          {completed_dates} times\n')
+    print(f'Current Habit streak: {current_streak}')
+    print(f'Longest Habit streak: {longest_streak}')
 
 
 def main_stats():
-    print(f'These are your daily habits: {get_habits(period = 'daily')}')
-    print(f'These are your weekly habits: {get_habits(period = 'weekly')}')
-    print(f'These are your monthly habits: {get_habits(period = 'monthly')}')
-    print(f'These are your yearly habits: {get_habits(period = 'yearly')}')
+
+    print(f'These are your current daily habits: \n {return_habits_by_period('daily')} \n'
+        f'These are your current weekly habits: \n {return_habits_by_period('weekly')} \n'
+        f'These are your current monthly habits: \n {return_habits_by_period('monthly')} \n'
+        f'These are your current yearly habits: \n {return_habits_by_period('yearly')} \n')
+    print(f'This is your overall longest streak: {return_overall_longest_streak()}')
+    main_menu()
+
 
 if __name__ == '__main__':
     main_menu()
