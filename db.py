@@ -2,6 +2,14 @@ import sqlite3
 
 
 def create(habit_id, name, description, period):
+    """
+    Creates a database entry with habit information.
+
+    :param habit_id: unique identifier of the habit
+    :param name: name of the habit
+    :param description: description of the habit
+    :param period: periodicity of the habit(i.e. 'daily', 'weekly', 'monthly', 'year')
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
@@ -13,6 +21,14 @@ def create(habit_id, name, description, period):
         con.commit()
 
 def edit(habit_id, name, description, period):
+    """
+    Updates a database entry with new habit information.
+
+    :param habit_id: unique identifier of the habit
+    :param name: name of the habit
+    :param description: description of the habit
+    :param period: periodicity of the habit(i.e. 'daily', 'weekly', 'monthly', 'year')
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
@@ -23,6 +39,11 @@ def edit(habit_id, name, description, period):
     con.commit()
 
 def delete(habit_id):
+    """
+    Deletes a database entry via their identifier.
+
+    :param habit_id: unique identifier of the habit
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
@@ -34,39 +55,45 @@ def delete(habit_id):
 
 
 def mark_complete(habit_id, date):
+    """
+    Adds a date and identifier to the database.
+
+    :param habit_id: unique identifier of the habit
+    :param date: the date the user marks as complete
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
+        cursor.execute("""
+            INSERT INTO checks (habit_id, completed_date) VALUES(?, ?)
+        """, (habit_id, date))
 
-        if not check_date(habit_id, date):
-            cursor.execute("""
-                INSERT INTO checks (habit_id, completed_date) VALUES(?, ?)
-            """, (habit_id, date))
+        con.commit()
 
-            con.commit()
-            return True
-
-        else :
-            return False
 
 
 def mark_incomplete(habit_id, date):
+    """
+    Removes a date marked as completed from the database.
+
+    :param habit_id: unique identifier of the habit
+    :param date: the date the user marks as incomplete
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
-
-        if check_date(habit_id, date):
-            cursor.execute("""
-                DELETE FROM checks WHERE habit_id = ? AND completed_date = ?
+        cursor.execute("""
+            DELETE FROM checks WHERE habit_id = ? AND completed_date = ?
         """, (habit_id, date))
 
-            con.commit()
-
-            return True
-
-        else:
-            return False
+        con.commit()
 
 
 def check_for_habit_by_id(habit_id):
+    """
+    Determines if a habit identifier exists in the database.
+
+    :param habit_id: unique identifier of the habit
+    :return: bool, True if the habit identifier exists in the database, False if not
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
         cursor.execute("""
@@ -86,6 +113,12 @@ def check_for_habit_by_id(habit_id):
 
 
 def check_for_habit_by_name(name):
+    """
+    Determines if a habit name exists in the database.
+
+    :param name: name of the habit
+    :return: bool, True if the habit name exists in the database, False if not
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
         cursor.execute("""
@@ -105,7 +138,12 @@ def check_for_habit_by_name(name):
 
 
 def check_date(habit_id, date):
-    """Determines if the given date is already checked off.
+    """
+    Determines if a date already exists in the database for a habit.
+
+    :param habit_id: unique identifier of the habit
+    :param date: the date checked against the database
+    :return: bool, True if the date exists for a habit in the database, False if not
     """
     count = get_habit_completion_count(habit_id)
     with sqlite3.connect(Habit.DB_NAME) as con:
@@ -125,6 +163,12 @@ def check_date(habit_id, date):
 
 
 def get_habit_by_id(habit_id):
+    """
+    Searches for and returns habit information stored in the database.
+
+    :param habit_id: unique identifier of the habit
+    :return: habit information as a class instance
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
         cursor.execute("""
@@ -135,6 +179,12 @@ def get_habit_by_id(habit_id):
                      description = data[2], period = data[3], creation_time = data[4])
 
 def get_habit_dates(habit_id):
+    """
+    Returns all dates marked complete for a habit.
+
+    :param habit_id: unique identifier of the habit
+    :return: list of all dates marked complete for a habit
+    """
     with (sqlite3.connect(Habit.DB_NAME) as con):
         cursor = con.cursor()
         cursor.execute("""
@@ -148,6 +198,12 @@ def get_habit_dates(habit_id):
 
 
 def get_period_by_id(habit_id):
+    """
+    Returns the periodicity of a habit as a string.
+
+    :param habit_id: unique identifier of the habit
+    :return: period of a habit as a string
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
         cursor.execute("""
@@ -158,9 +214,15 @@ def get_period_by_id(habit_id):
         return result
 
 def get_habit_completion_count(habit_id):
+    """
+    Returns the amount of dates marked complete for a habit.
 
-        count = len(get_habit_dates(habit_id))
-        return count
+    :param habit_id: unique identifier of the habit
+    :return: length of the list of completed dates for a habit
+    """
+    count = len(get_habit_dates(habit_id))
+    return count
+
 
 
 from habit import Habit
