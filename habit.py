@@ -3,10 +3,21 @@ from datetime import timedelta, date
 
 
 class Habit:
-
+    """
+    Habit class object. Establishes the database name.
+    """
     DB_NAME = "habits.db"
 
     def __init__(self, habit_id = None, name = None, description = None, period = None, creation_time = None):
+        """
+        Initialization of the class.
+
+        :param habit_id: unique identifier of a habit
+        :param name: name of a habit
+        :param description: description of a habit
+        :param period: periodicity of a habit, (i.e. daily, weekly, monthly, yearly)
+        :param creation_time: creation time of a habit
+        """
         self.habit_id = habit_id
         self.name = name
         self.description = description
@@ -17,6 +28,9 @@ class Habit:
         self.initialize_db()
 
     def initialize_db(self):
+        """
+        Initializes the database and creates tables habit and checks.
+        """
         with sqlite3.connect(self.DB_NAME) as con:
             cursor = con.cursor()
             cursor.execute("""
@@ -43,7 +57,11 @@ class Habit:
 
 
     def add_habit(self):
+        """
+        Checks that a habit doesn't exist before creating it.
 
+        :return: bool, True if the habit was created, False if not
+        """
         if not db.check_for_habit_by_name(self.name):
             db.create(self.habit_id, self.name, self.description, self.period)
             return True
@@ -55,7 +73,11 @@ class Habit:
             return None
 
     def edit_habit(self):
+        """
+        Checks that a habit exists before editing the habit's database entry.
 
+        :return: bool, True if habit was edited, False if not
+        """
         if db.check_for_habit_by_id(self.habit_id):
             db.edit(self.habit_id, self.name, self.description, self.period)
             return True
@@ -68,7 +90,11 @@ class Habit:
 
 
     def delete_habit(self):
+        """
+        Checks that a habit exists before deleting the habit's database entry.
 
+        :return: bool, True if habit was deleted, False if not
+        """
         if db.check_for_habit_by_name(self.name):
             db.delete(self.habit_id)
             return True
@@ -80,6 +106,19 @@ class Habit:
             return None
 
     def calculate_streak(self):
+        """
+        Calculates the streak of any habit and their periodicity.
+
+        Firstly gets the periodicity of the habit and sorts all completed dates for the habit.
+        If there are no dates, sets the streak to 0. Else sets it to 1.
+        
+        Daily streaks are evaluated by consecutive dates.
+        Weekly streaks are evaluated by the timedelta and weekday difference of dates.
+        Monthly streaks are evaluated by consecutive months.
+        Yearly streaks are evaluated by consecutive years.
+
+        Sets the streaks of the habit instance to the reults.
+        """
         sorted_dates = sorted(db.get_habit_dates(self.habit_id))
         period = db.get_period_by_id(self.habit_id)
 
@@ -149,13 +188,24 @@ class Habit:
 
 
     def get_current_streak(self):
+        """
+        Calculates and returns the current streak for a habit.
+
+        :return: current streak of a habit instance
+        """
         self.calculate_streak()
         return self.current_streak
 
 
     def get_longest_streak(self):
+        """
+        Calculates and returns the longest streak for a habit.
+
+        :return: longest streak of a habit
+        """
         self.calculate_streak()
         return self.longest_streak
+
 
 
 import db
