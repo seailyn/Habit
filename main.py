@@ -6,6 +6,10 @@ from db import check_date, mark_incomplete, mark_complete, get_habit_by_id, get_
 
 
 def main_menu():
+    """
+    Command line interface based on questionary to display the menu of the habit tacking application.
+    Lets the user select between seven optional choices.
+    """
     choice = questionary.select(
         "Welcome to the Habit tracking application. What would you like to do?",
         choices=[
@@ -36,6 +40,13 @@ def main_menu():
 
 
 def main_check():
+    """
+    Prompts the user with a selection choice of all habits.
+    Asks the user what date they want to check.
+    Determines if the date was already checked for the selected habit.
+    Asks the user for confirmation to uncheck, if it's already been checked.
+    Marks the date as completed, if it hasn't already been checked.
+    """
     print(f'Please select the habit you want to complete.')
     habits = questionary.select('These are your current habits:',
                                 choices=
@@ -100,6 +111,10 @@ def main_check():
 
 
 def main_create():
+    """
+    Asks the user for the name, description, and period of the habit to be created.
+    Creates both a habit instance and a database entry.
+    """
     name = questionary.text('What is the name of your Habit?').ask()
     description = questionary.text('What is the description of your Habit?').ask()
     period = questionary.select(
@@ -120,6 +135,11 @@ def main_create():
 
 
 def main_edit():
+    """
+    Prompts the user with a selection choice of all habits.
+    Retrieves old habit data and asks the user for the new information.
+    Edits both the habit instance and the database entry.
+    """
     habits = questionary.select('These are your current habits:',
                                 choices=
                                 return_questionary_choice_habits()
@@ -148,6 +168,11 @@ def main_edit():
 
 
 def main_delete():
+    """
+    Prompts the user with a selection choice of all habits.
+    Retrieves the habit data and asks the user for confirmation.
+    Deletes the habit after confirmation.
+    """
     print(f'Please select the habit you want to delete.')
     habits = questionary.select('These are your current habits:',
                                 choices=
@@ -168,6 +193,11 @@ def main_delete():
 
 
 def main_analyze():
+    """
+    Prompts the user with a selection choice of all habits.
+    Retrieves all the information of the habit.
+    Presents the information to the user.
+    """
     print(f'Please select the habit you want to analyze.')
     habits = questionary.select('These are your current habits:',
                                 choices=
@@ -194,7 +224,9 @@ def main_analyze():
 
 
 def main_stats():
-
+    """
+    Presents habit tracking information not tied to any singular habit instance.
+    """
     print(f'These are your current daily habits: \n {return_habits_by_period('daily')} \n'
         f'These are your current weekly habits: \n {return_habits_by_period('weekly')} \n'
         f'These are your current monthly habits: \n {return_habits_by_period('monthly')} \n'
@@ -205,3 +237,4 @@ def main_stats():
 
 if __name__ == '__main__':
     main_menu()
+
