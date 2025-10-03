@@ -3,7 +3,11 @@ from habit import Habit
 
 
 def return_questionary_choice_habits():
+    """
+    Returns a list of all habits in the format used by questionary.
 
+    :return: list of habit information
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
         cursor.execute("""SELECT id from habit""")
@@ -20,15 +24,25 @@ def return_questionary_choice_habits():
 
 
 def return_habits_by_period(period):
+    """
+    Returns the information of all habits of a periodicity as a list of tuples.
+
+    :return: habit information of a period
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
-
         cursor.execute("""SELECT * from habit WHERE period = ?""", (period,))
         result = cursor.fetchall()
         return result
 
 
 def return_overall_longest_streak():
+    """
+    Gets the identifier of all habits from the database, calculates the streaks of the habits, and
+    returns the overall longest streak.
+
+    :return: longest streak of all habits
+    """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
         cursor.execute("""SELECT id FROM habit""")
@@ -42,4 +56,5 @@ def return_overall_longest_streak():
             habit = Habit(habit_id = habit_id)
             streaks.append(habit.get_longest_streak())
         longest_streak = max(streaks)
+
         return longest_streak
