@@ -3,7 +3,7 @@
   - [Fundamental Features](#fundamental-features)
   - [Progression Analytics](#progression-analytics)
 + [Requirements](#requirements)
-+ Installation Guide
++ [Installation Guide](#installation-guide)
 + Usage
   - Completing a Habit
   - Creating a Habit
@@ -36,3 +36,22 @@ This habit tracking application is part of a project for the course *DLBDSOOFPP0
 
 # Requirements
 + python 3.12+
++ questionary 2.1.1+
++ pytest 8.4.2+
+
+# Installation Guide
+The newest python version can be downloaded from [here](https://www.python.org/downloads/). 
+Follow the installation setup, but make sure to enable 'Add python.exe to PATH'.
+
+After python has been installed, open cmd and change your directory to the downloaded folder using:
+```
+cd 'file path of downloaded folder(e.g. C:\Users\Anonymous\Dowloads\Habit-main)
+```
+Subsequently run the following prompt to install all the additional requirements:
+```
+pip install -r requirements.txt
+```
+Finally start your habit tracking application with:
+```
+py main.py
+```
