@@ -4,7 +4,7 @@
   - [Progression Analytics](#progression-analytics)
 + [Requirements](#requirements)
 + [Installation Guide](#installation-guide)
-+ Usage
++ [Usage](#usage)
   - Completing a Habit
   - Creating a Habit
   - Editing a Habit
@@ -55,3 +55,18 @@ Finally start your habit tracking application with:
 ```
 py main.py
 ```
+The installation was successful if you see:
+```
+Welcome to the Habit tracking application. What would you like to do? (Use arrow keys)
+ » Complete Habit
+   Create Habit
+   Edit Habit
+   Delete Habit
+   Analyze Habit
+   Stats
+   Exit
+```
+
+# Usage
+
+## Completing a Habit
