@@ -5,14 +5,14 @@
 + [Requirements](#requirements)
 + [Installation Guide](#installation-guide)
 + [Usage](#usage)
-  - Completing a Habit
-  - Creating a Habit
-  - Editing a Habit
-  - Deleting a Habit
-  - Analyzing a Habit
-  - Display Statistics
-  - Exit
-+ Testing
+  - [Completing a Habit](#completing-a-habit)
+  - [Creating a Habit](#creating-a-habit)
+  - [Editing a Habit](#editing-a-habit)
+  - [Deleting a Habit](#deleting-a-habit)
+  - [Analyzing a Habit](#analyzing-a-habit)
+  - [Display Statistics](#displaying-statistics)
+  - [Exit](#exit)
++ [Testing](#testing)
 
 # Habit Tracker
 Habits, good and bad, are an integral part of everyone's lifes. Unfortunately most bad habits go unnoticed in our everyday lifes, until they have 
@@ -45,7 +45,7 @@ Follow the installation setup, but make sure to enable 'Add python.exe to PATH'.
 
 After python has been installed, open cmd and change your directory to the downloaded folder using:
 ```
-cd 'file path of downloaded folder(e.g. C:\Users\Anonymous\Dowloads\Habit-main)
+cd 'file path of downloaded folder(e.g. C:\Users\Anonymous\Downloads\Habit-main)
 ```
 Subsequently run the following prompt to install all the additional requirements:
 ```
@@ -68,5 +68,31 @@ Welcome to the Habit tracking application. What would you like to do? (Use arrow
 ```
 
 # Usage
+The habit tracking application comes with three predefined daily habits(Exercise, Mail, Medication), and two predefined weekly habits(Meal prep, Read).
 
-## Completing a Habit
+### Completing a Habit
+Selecting "Complete Habit" lets you choose a habit to mark complete/incomplete for a date. 
+
+Requests the date you wish to mark complete. If the date has already been marked, asks for confirmation of the deletion of the entry.
+
+### Creating a Habit
+Lets you input the name, description, and period of the habit u wish to add.
+
+Afterwards checks, that the habit does not exist, before adding it to the database.
+
+### Editing a Habit
+Prompts you with a selection of habits and lets you enter habit information similarly to creating a habit.
+
+### Deleting a Habit
+Prompts you with a selection of habits and asks for your confirmation to delete the habit.
+
+### Analyzing a Habit
+Prompts you with a selection of habits and returns all available information for the selected habit.
+
+### Displaying Statistics
+Display overall statistics unrelated to singular habits.
+
+### Exit
+Exits the habit tracking application.
+
+# Testing
