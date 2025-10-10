@@ -96,3 +96,8 @@ Display overall statistics unrelated to singular habits.
 Exits the habit tracking application.
 
 # Testing
+After following the installation guide, type pytest into the console to invoke testing of the habit tracking application.
+```
+pytest
+```
+
