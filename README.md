@@ -43,9 +43,9 @@ This habit tracking application is part of a project for the course *DLBDSOOFPP0
 The newest python version can be downloaded from [here](https://www.python.org/downloads/). 
 Follow the installation setup, but make sure to enable 'Add python.exe to PATH'.
 
-After python has been installed, open cmd and change your directory to the downloaded folder using:
+After python has been installed, open cmd and change your directory to the unzipped downloaded folder using:
 ```
-cd 'file path of downloaded folder(e.g. C:\Users\Anonymous\Downloads\Habit-main)
+cd 'file path of unzipped downloaded folder(e.g. C:\Users\Anonymous\Downloads\Habit-main)
 ```
 Subsequently run the following prompt to install all the additional requirements:
 ```
