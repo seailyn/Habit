@@ -117,7 +117,7 @@ class Habit:
         Monthly streaks are evaluated by consecutive months.
         Yearly streaks are evaluated by consecutive years.
 
-        Sets the streaks of the habit instance to the reults.
+        Sets the streaks of the habit instance to the results.
         """
         sorted_dates = sorted(db.get_habit_dates(self.habit_id))
         period = db.get_period_by_id(self.habit_id)
@@ -209,4 +209,5 @@ class Habit:
 
 
 import db
+
 
