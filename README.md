@@ -13,6 +13,7 @@
   - [Display Statistics](#displaying-statistics)
   - [Exit](#exit)
 + [Testing](#testing)
+  - [Tests](#tests)
 
 # Habit Tracker
 Habits, good and bad, are an integral part of everyone's lifes. Unfortunately most bad habits go unnoticed in our everyday lifes, until they have 
@@ -100,4 +101,17 @@ After following the installation guide, type pytest into the console to invoke t
 ```
 pytest
 ```
-
+### Tests
++ Creating habits
++ Marking habits complete
++ Marking habits incomplete
++ Calculating daily habits streaks
++ Calculating weekly habits streaks
++ Calculating monthly habits streaks
++ Calculating yearly habits streaks
++ Editing habits
++ Deleting habits
++ Returning current/longest streaks
++ Returning overall longest streak
++ Returning date counts
++ Returning habits of periodicities
