@@ -62,11 +62,11 @@ class Habit:
 
         :return: bool, True if the habit was created, False if not
         """
-        if not db.check_for_habit_by_name(self.name):
+        if not analytics.check_for_habit_by_name(self.name):
             db.create(self.habit_id, self.name, self.description, self.period)
             return True
 
-        elif db.check_for_habit_by_name(self.name):
+        elif analytics.check_for_habit_by_name(self.name):
             return False
 
         else:
@@ -78,11 +78,11 @@ class Habit:
 
         :return: bool, True if habit was edited, False if not
         """
-        if db.check_for_habit_by_id(self.habit_id):
+        if analytics.check_for_habit_by_id(self.habit_id):
             db.edit(self.habit_id, self.name, self.description, self.period)
             return True
 
-        elif not db.check_for_habit_by_id(self.habit_id):
+        elif not analytics.check_for_habit_by_id(self.habit_id):
             return False
 
         else:
@@ -95,11 +95,11 @@ class Habit:
 
         :return: bool, True if habit was deleted, False if not
         """
-        if db.check_for_habit_by_name(self.name):
+        if analytics.check_for_habit_by_name(self.name):
             db.delete(self.habit_id)
             return True
 
-        elif not db.check_for_habit_by_name(self.name):
+        elif not analytics.check_for_habit_by_name(self.name):
             return False
 
         else:
@@ -119,8 +119,8 @@ class Habit:
 
         Sets the streaks of the habit instance to the results.
         """
-        sorted_dates = sorted(db.get_habit_dates(self.habit_id))
-        period = db.get_period_by_id(self.habit_id)
+        sorted_dates = sorted(analytics.get_habit_dates(self.habit_id))
+        period = analytics.get_period_by_id(self.habit_id)
 
         if not sorted_dates:
             self.current_streak = 0
@@ -209,5 +209,4 @@ class Habit:
 
 
 import db
-
-
+import analytics
