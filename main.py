@@ -1,8 +1,9 @@
 from datetime import date, datetime
 import questionary
+
+import analytics
+import db
 from habit import Habit
-from analytics import return_questionary_choice_habits, return_overall_longest_streak, return_habits_by_period
-from db import check_date, mark_incomplete, mark_complete, get_habit_by_id, get_habit_completion_count
 
 
 def main_menu():
@@ -50,7 +51,7 @@ def main_check():
     print(f'Please select the habit you want to complete.')
     habits = questionary.select('These are your current habits:',
                                 choices=
-                                return_questionary_choice_habits()
+                                analytics.return_questionary_choice_habits()
                                 ).ask()
 
     split = habits.split(',')[0]
@@ -61,20 +62,20 @@ def main_check():
 
         date_today = date.today().strftime("%Y-%m-%d")
 
-        if check_date(habit_id, date_today):
+        if analytics.check_date(habit_id, date_today):
             uncheck_today = questionary.confirm(
                 f'Habit has already been checked for {date_today}. Do you want to uncheck {date_today}?').ask()
 
             if uncheck_today:
-                mark_incomplete(habit_id, date_today)
+                db.mark_incomplete(habit_id, date_today)
                 print(f'Habit has been successfully unchecked for {date_today}.')
                 main_menu()
 
             elif not uncheck_today:
                 main_menu()
 
-        elif not check_date(habit_id, date_today):
-            mark_complete(habit_id, date_today)
+        elif not analytics.check_date(habit_id, date_today):
+            db.mark_complete(habit_id, date_today)
             print(f'Habit has been successfully checked for {date_today}.')
             main_menu()
 
@@ -90,14 +91,14 @@ def main_check():
             print('Please enter the date you want to check in this format: YYYY-MM-DD')
             main_menu()
 
-        approval = check_date(habit_id, entered_date)
+        approval = analytics.check_date(habit_id, entered_date)
 
         if approval:
             uncheck_date = questionary.confirm(
                 f'Habit has already been checked for {entered_date}. Do you want to uncheck?').ask()
 
             if uncheck_date:
-                mark_incomplete(habit_id, entered_date)
+                db.mark_incomplete(habit_id, entered_date)
                 print(f'Habit has been successfully unchecked for {entered_date}.')
                 main_menu()
 
@@ -105,7 +106,7 @@ def main_check():
                 main_menu()
 
         elif not approval:
-            mark_complete(habit_id, entered_date)
+            db.mark_complete(habit_id, entered_date)
             print(f'Habit has been successfully checked for {entered_date}.')
             main_menu()
 
@@ -128,9 +129,10 @@ def main_create():
     ).ask()
 
     habit = Habit(name=name, description=description, period=period)
-
     habit.add_habit()
+
     print('Habit created!')
+
     main_menu()
 
 
@@ -142,13 +144,13 @@ def main_edit():
     """
     habits = questionary.select('These are your current habits:',
                                 choices=
-                                return_questionary_choice_habits()
+                                analytics.return_questionary_choice_habits()
                                 ).ask()
 
     split = habits.split(',')[0]
     habit_id = split[1:]
 
-    old_habit = get_habit_by_id(habit_id)
+    old_habit = analytics.get_habit_by_id(habit_id)
 
     name = questionary.text(f'Please enter the new habit name(current: {old_habit.name}):').ask()
     description = questionary.text(f'Please enter the new habit description:(current: {old_habit.description}):').ask()
@@ -163,7 +165,9 @@ def main_edit():
 
     habit = Habit(habit_id=habit_id, name=name, description=description, period=period)
     habit.edit_habit()
+
     print('Habit edited!')
+
     main_menu()
 
 
@@ -176,17 +180,18 @@ def main_delete():
     print(f'Please select the habit you want to delete.')
     habits = questionary.select('These are your current habits:',
                                 choices=
-                                return_questionary_choice_habits()
+                                analytics.return_questionary_choice_habits()
                                 ).ask()
 
     split = habits.split(',')[0]
     habit_id = split[1:]
 
-    habit = get_habit_by_id(habit_id)
+    habit = analytics.get_habit_by_id(habit_id)
 
     approval = questionary.confirm(f'Are you sure you want to delete Habit: {habit.name}?').ask()
     if approval:
         habit.delete_habit()
+
         print('Habit deleted!')
 
     main_menu()
@@ -201,17 +206,17 @@ def main_analyze():
     print(f'Please select the habit you want to analyze.')
     habits = questionary.select('These are your current habits:',
                                 choices=
-                                return_questionary_choice_habits()
+                                analytics.return_questionary_choice_habits()
                                 ).ask()
 
     split = habits.split(',')[0]
     habit_id = split[1:]
 
-    habit_data = get_habit_by_id(habit_id)
+    habit_data = analytics.get_habit_by_id(habit_id)
     habit = Habit(habit_id = habit_id)
     current_streak = habit.get_current_streak()
     longest_streak = habit.get_longest_streak()
-    completed_dates = get_habit_completion_count(habit_id)
+    completed_dates = analytics.get_habit_completion_count(habit_id)
 
     print(f'Habit ID:               {habit_data.habit_id}\n'
           f'Habit Name:             {habit_data.name}\n'
@@ -227,11 +232,36 @@ def main_stats():
     """
     Presents habit tracking information not tied to any singular habit instance.
     """
-    print(f'These are your current daily habits: \n {return_habits_by_period('daily')} \n'
-        f'These are your current weekly habits: \n {return_habits_by_period('weekly')} \n'
-        f'These are your current monthly habits: \n {return_habits_by_period('monthly')} \n'
-        f'These are your current yearly habits: \n {return_habits_by_period('yearly')} \n')
-    print(f'This is your overall longest streak: {return_overall_longest_streak()}')
+    stats = questionary.select('Please enter the habit tracking information:',
+        choices=[
+            'List of daily habits',
+            'List of weekly habits',
+            'List of monthly habits',
+            'List of yearly habits',
+            'All of the above',
+            'Overall longest streak'
+        ]
+    ).ask()
+
+
+    if stats == 'List of daily habits':
+        analytics.print_habits(analytics.return_habits_by_period('daily'))
+
+    elif stats == 'List of weekly habits':
+        analytics.print_habits(analytics.return_habits_by_period('weekly'))
+
+    elif stats == 'List of monthly habits':
+        analytics.print_habits(analytics.return_habits_by_period('monthly'))
+
+    elif stats == 'List of yearly habits':
+        analytics.print_habits(analytics.return_habits_by_period('yearly'))
+
+    elif stats == 'All of the above':
+        analytics.print_habits(analytics.return_habits_by_period(None))
+
+    elif stats == 'Overall longest streak':
+        print(f'Your overall longest streak is {analytics.return_overall_longest_streak()}.')
+
     main_menu()
 
 
