@@ -18,7 +18,7 @@ def check_for_habit_by_id(habit_id):
                        """)
 
         for i in cursor.fetchall():
-            ids = str(i).split(',')[0]
+            ids = str(i).split(",")[0]
             if str(habit_id) == ids[1:]:
                 return True
             else:
@@ -67,11 +67,14 @@ def check_date(habit_id, date):
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT completed_date
                        FROM checks
                        WHERE habit_id = ?
-                       """, (habit_id,))
+                       """,
+            (habit_id,),
+        )
 
         for i in range(0, count):
             checked_times = str(cursor.fetchone())
@@ -93,16 +96,24 @@ def get_habit_by_id(habit_id):
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT *
                        FROM habit
                        WHERE id = ?
-                       """, (habit_id,))
+                       """,
+            (habit_id,),
+        )
 
         data = cursor.fetchone()
 
-        return Habit(habit_id=data[0], name=data[1],
-                     description=data[2], period=data[3], creation_time=data[4])
+        return Habit(
+            habit_id=data[0],
+            name=data[1],
+            description=data[2],
+            period=data[3],
+            creation_time=data[4],
+        )
 
 
 def get_habit_dates(habit_id):
@@ -112,14 +123,17 @@ def get_habit_dates(habit_id):
     :param habit_id: unique identifier of the habit
     :return: list of all dates marked complete for a habit
     """
-    with (sqlite3.connect(Habit.DB_NAME) as con):
+    with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT completed_date
                        FROM checks
                        WHERE habit_id = ?
-                       """, (habit_id,))
+                       """,
+            (habit_id,),
+        )
 
         checked_dates = []
 
@@ -139,11 +153,14 @@ def get_period_by_id(habit_id):
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
                        SELECT period
                        from habit
                        WHERE id = ?
-                       """, (habit_id,))
+                       """,
+            (habit_id,),
+        )
 
         period = str(cursor.fetchone())
         result = period[2:-3]
@@ -171,17 +188,17 @@ def return_questionary_choice_habits():
     """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
-        
+
         cursor.execute("""SELECT id from habit""")
         count = len(cursor.fetchall())
-        
+
         cursor.execute("""SELECT id, name, description from habit""")
 
         result = []
 
         for i in range(0, count):
             habits = cursor.fetchone()
-            result.append(f'{str(habits)}')
+            result.append(f"{str(habits)}")
 
         return result
 
@@ -198,23 +215,31 @@ def return_habits_by_period(period):
         if period is not None:
             cursor.execute("""SELECT * FROM habit WHERE period = ?""", (period,))
             habits = cursor.fetchall()
-        
+
         else:
             cursor.execute("""SELECT * from habit""")
             habits = cursor.fetchall()
 
         return habits
 
+
 def print_habits(habits):
-    print('__________________________________________________________________________________')
-    print('|{:^6} {:^21} {:^21} {:^7} {:^21}|'.format(
-        'ID', 'Name', 'Description', 'Period', 'Creation Time'))
-    print('|________________________________________________________________________________|')
+    print(
+        "__________________________________________________________________________________"
+    )
+    print(
+        "|{:^6} {:^21} {:^21} {:^7} {:^21}|".format(
+            "ID", "Name", "Description", "Period", "Creation Time"
+        )
+    )
+    print(
+        "|________________________________________________________________________________|"
+    )
     for i in habits:
-        print('|{:^5}| {:^20}| {:^20}| {:7}| {:19} |'.format(
-            i[0], i[1], i[2], i[3], i[4]
-        ))
-    overline = 82 * '\u203e'
+        print(
+            "|{:^5}| {:^20}| {:^20}| {:7}| {:19} |".format(i[0], i[1], i[2], i[3], i[4])
+        )
+    overline = 82 * "\u203e"
     print(overline)
 
 
@@ -227,19 +252,19 @@ def return_overall_longest_streak():
     """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
-        
+
         cursor.execute("""SELECT id FROM habit""")
         count = len(cursor.fetchall())
-        
+
         cursor.execute("""SELECT id FROM habit""")
-        
+
         streaks = []
-        
-        for i in range(0,count):
+
+        for i in range(0, count):
             habits = str(cursor.fetchone())
-            split = habits.split(',')[0]
+            split = habits.split(",")[0]
             habit_id = split[1:]
-            habit = Habit(habit_id = habit_id)
+            habit = Habit(habit_id=habit_id)
             streaks.append(habit.get_longest_streak())
         longest_streak = max(streaks)
 

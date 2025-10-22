@@ -11,6 +11,8 @@ def adapt_date_iso(val):
     :return: transformed date
     """
     return val.isoformat()
+
+
 sqlite3.register_adapter(datetime.date, adapt_date_iso)
 
 
@@ -26,9 +28,12 @@ def create(habit_id, name, description, period):
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO habit (id, name, description, period) VALUES (?, ?, ?, ?)
-        """, (habit_id, name, description, period))
+        """,
+            (habit_id, name, description, period),
+        )
 
         con.commit()
 
@@ -45,12 +50,15 @@ def edit(habit_id, name, description, period):
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
 
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE habit SET name = ?, description = ?, period = ? WHERE id = ?
-        """, (name, description, period, habit_id))
+        """,
+            (name, description, period, habit_id),
+        )
 
     con.commit()
-    
+
 
 def delete(habit_id):
     """
@@ -63,10 +71,13 @@ def delete(habit_id):
         cursor = con.cursor()
 
         cursor.execute("PRAGMA foreign_keys = ON;")
-        
-        cursor.execute("""
+
+        cursor.execute(
+            """
             DELETE FROM habit WHERE id = ?
-        """, (habit_id,))
+        """,
+            (habit_id,),
+        )
 
         con.commit()
 
@@ -80,10 +91,13 @@ def mark_complete(habit_id, date):
     """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
-        
-        cursor.execute("""
+
+        cursor.execute(
+            """
             INSERT INTO checks (habit_id, completed_date) VALUES(?, ?)
-        """, (habit_id, date))
+        """,
+            (habit_id, date),
+        )
 
         con.commit()
 
@@ -97,9 +111,12 @@ def mark_incomplete(habit_id, date):
     """
     with sqlite3.connect(Habit.DB_NAME) as con:
         cursor = con.cursor()
-        
-        cursor.execute("""
+
+        cursor.execute(
+            """
             DELETE FROM checks WHERE habit_id = ? AND completed_date = ?
-        """, (habit_id, date))
+        """,
+            (habit_id, date),
+        )
 
         con.commit()

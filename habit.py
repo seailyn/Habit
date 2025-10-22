@@ -6,9 +6,17 @@ class Habit:
     """
     Habit class object. Establishes the database name.
     """
+
     DB_NAME = "habits.db"
 
-    def __init__(self, habit_id = None, name = None, description = None, period = None, creation_time = None):
+    def __init__(
+        self,
+        habit_id=None,
+        name=None,
+        description=None,
+        period=None,
+        creation_time=None,
+    ):
         """
         Initialization of the class.
 
@@ -55,7 +63,6 @@ class Habit:
 
             con.commit()
 
-
     def add_habit(self):
         """
         Checks that a habit doesn't exist before creating it.
@@ -88,7 +95,6 @@ class Habit:
         else:
             return None
 
-
     def delete_habit(self):
         """
         Checks that a habit exists before deleting the habit's database entry.
@@ -111,7 +117,7 @@ class Habit:
 
         Firstly gets the periodicity of the habit and sorts all completed dates for the habit.
         If there are no dates, sets the streak to 0. Else sets it to 1.
-        
+
         Daily streaks are evaluated by consecutive dates.
         Weekly streaks are evaluated by the timedelta and weekday difference of dates.
         Monthly streaks are evaluated by consecutive months.
@@ -129,7 +135,7 @@ class Habit:
         current_streak = 1
         longest_streak = 1
 
-        if period == 'daily':
+        if period == "daily":
             for i in range(1, len(sorted_dates)):
                 date_i = date.fromisoformat(sorted_dates[i])
                 date_zero = date.fromisoformat(sorted_dates[i - 1])
@@ -140,40 +146,49 @@ class Habit:
                 else:
                     current_streak = 1
 
-        elif period == 'weekly':
+        elif period == "weekly":
             for i in range(1, len(sorted_dates)):
                 date_i = date.fromisoformat(sorted_dates[i])
                 date_zero = date.fromisoformat(sorted_dates[i - 1])
                 date_i_weekday = date.fromisoformat(sorted_dates[i]).weekday()
                 date_zero_weekday = date.fromisoformat(sorted_dates[i - 1]).weekday()
 
-                if (date_i - date_zero < timedelta (days=7) and
-                        date_i_weekday > date_zero_weekday):
+                if (
+                    date_i - date_zero < timedelta(days=7)
+                    and date_i_weekday > date_zero_weekday
+                ):
                     continue
 
-                elif (date_i - date_zero < timedelta(days=7) and date_i_weekday < date_zero_weekday or
-                    date_i - date_zero == timedelta(days=7) or
-                    timedelta(days=7) < date_i - date_zero < timedelta(days=14) and date_i_weekday > date_zero_weekday):
+                elif (
+                    date_i - date_zero < timedelta(days=7)
+                    and date_i_weekday < date_zero_weekday
+                    or date_i - date_zero == timedelta(days=7)
+                    or timedelta(days=7) < date_i - date_zero < timedelta(days=14)
+                    and date_i_weekday > date_zero_weekday
+                ):
                     current_streak += 1
                     longest_streak = max(longest_streak, current_streak)
                 else:
                     current_streak = 1
 
-        elif period == 'monthly':
+        elif period == "monthly":
             for i in range(1, len(sorted_dates)):
                 date_i_month = date.fromisoformat(sorted_dates[i]).month
                 date_zero_month = date.fromisoformat(sorted_dates[i - 1]).month
                 date_i_year = date.fromisoformat(sorted_dates[i]).year
                 date_zero_year = date.fromisoformat(sorted_dates[i - 1]).year
 
-                if (date_i_month - date_zero_month == 1
-                        or date_i_month - date_zero_month == -11 and date_i_year - date_zero_year == 1):
+                if (
+                    date_i_month - date_zero_month == 1
+                    or date_i_month - date_zero_month == -11
+                    and date_i_year - date_zero_year == 1
+                ):
                     current_streak += 1
                     longest_streak = max(longest_streak, current_streak)
                 else:
                     current_streak = 1
 
-        elif period == 'yearly':
+        elif period == "yearly":
             for i in range(1, len(sorted_dates)):
                 date_i_year = date.fromisoformat(sorted_dates[i]).year
                 date_zero_year = date.fromisoformat(sorted_dates[i - 1]).year
@@ -186,7 +201,6 @@ class Habit:
         self.current_streak = current_streak
         self.longest_streak = longest_streak
 
-
     def get_current_streak(self):
         """
         Calculates and returns the current streak for a habit.
@@ -196,7 +210,6 @@ class Habit:
         self.calculate_streak()
         return self.current_streak
 
-
     def get_longest_streak(self):
         """
         Calculates and returns the longest streak for a habit.
@@ -205,7 +218,6 @@ class Habit:
         """
         self.calculate_streak()
         return self.longest_streak
-
 
 
 import db
