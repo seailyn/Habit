@@ -58,7 +58,7 @@ class TestHabit:
 
         test_weekly_streak_1 = habit.get_current_streak()
 
-        db.mark_complete(999, "2025-09-08")
+        db.mark_complete(999, "2025-09-12")
         test_weekly_streak_2 = habit.get_current_streak()
 
         db.mark_complete(999, "2025-09-22")
@@ -158,3 +158,4 @@ class TestHabit:
             assert i[3] == "weekly"
 
         assert len(all_habits) == 5
+
